@@ -1,164 +1,79 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Session Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .tab-container {
-            margin-bottom: 20px;
-        }
-        .tab-button {
-            padding: 10px 20px;
-            background: #f0f0f0;
-            border: none;
-            cursor: pointer;
-        }
-        .tab-button.active {
-            background: #25D366;
-            color: white;
-        }
-        .tab-content {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        input, button {
-            padding: 10px;
-            margin: 10px 0;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background: #25D366;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #qrCode {
-            margin: 20px auto;
-            max-width: 300px;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 10px;
-            background: #f8f8f8;
-            border-radius: 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Session Generator</title>
+<style>
+body { font-family: Arial; max-width: 600px; margin: auto; padding: 20px; text-align: center; }
+.tab-container { margin-bottom: 20px; }
+.tab-button { padding: 10px 20px; cursor: pointer; background:#f0f0f0; border:none; }
+.tab-button.active { background: #25D366; color: white; }
+.tab-content { display:none; padding:20px; border:1px solid #ddd; border-radius:5px; }
+.tab-content.active { display:block; }
+input, button { padding:10px; margin:10px 0; width:100%; box-sizing:border-box; }
+button { background:#25D366; color:white; border:none; cursor:pointer; }
+#qrCode { margin:20px auto; max-width:300px; }
+.result { margin-top:20px; padding:10px; background:#f8f8f8; border-radius:5px; }
+</style>
 </head>
 <body>
-    <h1>WhatsApp Session Generator</h1>
-    
-    <div class="tab-container">
-        <button class="tab-button active" onclick="openTab('qrTab')">QR Code</button>
-        <button class="tab-button" onclick="openTab('pairTab')">Pairing Code</button>
-    </div>
-    
-    <div id="qrTab" class="tab-content active">
-        <h2>Generate Session via QR Code</h2>
-        <button id="generateQr">Generate QR Code</button>
-        <div id="qrCode"></div>
-        <div id="qrResult" class="result"></div>
-    </div>
-    
-    <div id="pairTab" class="tab-content">
-        <h2>Generate Session via Pairing Code</h2>
-        <input type="text" id="phoneNumber" placeholder="Enter phone number with country code">
-        <button id="generatePair">Get Pairing Code</button>
-        <div id="pairResult" class="result"></div>
-    </div>
+<h1>WhatsApp Session Generator</h1>
+<div class="tab-container">
+<button class="tab-button active" onclick="openTab('qrTab', this)">QR Code</button>
+<button class="tab-button" onclick="openTab('pairTab', this)">Pairing Code</button>
+</div>
 
-    <script>
-        function openTab(tabName) {
-            // Hide all tab content
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Deactivate all tab buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            
-            // Show the selected tab content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Activate the clicked button
-            event.currentTarget.classList.add('active');
-        }
-        
-        document.getElementById('generateQr').addEventListener('click', async () => {
-            const qrResult = document.getElementById('qrResult');
-            qrResult.innerHTML = 'Generating QR code...';
-            
-            try {
-                const response = await fetch('/api/qr', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('qrCode').innerHTML = `<img src="${data.qr}" alt="WhatsApp QR Code">`;
-                    qrResult.innerHTML = 'Scan the QR code with WhatsApp to authenticate. Session will be generated automatically.';
-                } else {
-                    qrResult.innerHTML = `Error: ${data.error}`;
-                }
-            } catch (error) {
-                qrResult.innerHTML = `Error: ${error.message}`;
-            }
-        });
-        
-        document.getElementById('generatePair').addEventListener('click', async () => {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const pairResult = document.getElementById('pairResult');
-            pairResult.innerHTML = 'Requesting pairing code...';
-            
-            if (!phoneNumber) {
-                pairResult.innerHTML = 'Please enter a phone number';
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/pair', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ phoneNumber })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    pairResult.innerHTML = `
-                        <p>Your pairing code is: <strong>${data.pairingCode}</strong></p>
-                        <p>${data.message}</p>
-                        <p>Session will be generated automatically after pairing.</p>
-                    `;
-                } else {
-                    pairResult.innerHTML = `Error: ${data.error}`;
-                }
-            } catch (error) {
-                pairResult.innerHTML = `Error: ${error.message}`;
-            }
-        });
-    </script>
+<div id="qrTab" class="tab-content active">
+<h2>Generate Session via QR Code</h2>
+<button id="generateQr">Generate QR Code</button>
+<div id="qrCode"></div>
+<div id="qrResult" class="result"></div>
+</div>
+
+<div id="pairTab" class="tab-content">
+<h2>Generate Session via Pairing Code</h2>
+<input type="text" id="phoneNumber" placeholder="Enter phone number with country code">
+<button id="generatePair">Get Pairing Code</button>
+<div id="pairResult" class="result"></div>
+</div>
+
+<script>
+function openTab(tabName, el) {
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    el.classList.add('active');
+}
+
+document.getElementById('generateQr').addEventListener('click', async ()=>{
+    const qrResult = document.getElementById('qrResult');
+    qrResult.innerHTML = 'Generating QR code...';
+    try {
+        const response = await fetch('/api/qr', { method:'POST', headers:{ 'Content-Type':'application/json' }});
+        if(!response.ok){ const text = await response.text(); throw new Error(text); }
+        const data = await response.json();
+        if(data.success){
+            document.getElementById('qrCode').innerHTML = `<img src="${data.qr}" alt="QR Code">`;
+            qrResult.innerHTML = data.message;
+        } else qrResult.innerHTML = `Error: ${data.error}`;
+    } catch(err){ qrResult.innerHTML = `Error: ${err.message}`; }
+});
+
+document.getElementById('generatePair').addEventListener('click', async ()=>{
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    const pairResult = document.getElementById('pairResult');
+    if(!phoneNumber){ pairResult.innerHTML='Please enter a phone number'; return; }
+    pairResult.innerHTML='Requesting pairing code...';
+    try {
+        const response = await fetch('/api/pair',{ method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({phoneNumber}) });
+        if(!response.ok){ const text = await response.text(); throw new Error(text); }
+        const data = await response.json();
+        if(data.success){
+            pairResult.innerHTML = `<p>Your pairing code: <strong>${data.pairingCode}</strong></p><p>${data.message}</p>`;
+        } else pairResult.innerHTML = `Error: ${data.error}`;
+    } catch(err){ pairResult.innerHTML = `Error: ${err.message}`; }
+});
+</script>
 </body>
 </html>

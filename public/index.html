@@ -1,79 +1,198 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WhatsApp Session Generator</title>
-<style>
-body { font-family: Arial; max-width: 600px; margin: auto; padding: 20px; text-align: center; }
-.tab-container { margin-bottom: 20px; }
-.tab-button { padding: 10px 20px; cursor: pointer; background:#f0f0f0; border:none; }
-.tab-button.active { background: #25D366; color: white; }
-.tab-content { display:none; padding:20px; border:1px solid #ddd; border-radius:5px; }
-.tab-content.active { display:block; }
-input, button { padding:10px; margin:10px 0; width:100%; box-sizing:border-box; }
-button { background:#25D366; color:white; border:none; cursor:pointer; }
-#qrCode { margin:20px auto; max-width:300px; }
-.result { margin-top:20px; padding:10px; background:#f8f8f8; border-radius:5px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUXALGO-XD PAIR CODE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url("https://i.ibb.co/fYj96cJN/SulaMd.jpg"); /* Set the background image */
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .box {
+      width: 300px;
+      height: 330px;
+      padding: 20px;
+      position: relative;
+      text-align: center;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 10px;
+      transform: perspective(1000px) rotateY(0deg);
+      box-shadow: none; /* Removed box shadow */
+      position: relative;
+    }
+
+    #text {
+      color: #000; /* Set the text color to black (#000) */
+    }
+
+    .input-container input {
+      color: #000; /* Set the text color to black (#000) */
+    }
+
+    .centered-text {
+      color: #000; /* Set the text color to black (#000) */
+    }
+
+    .input-container {
+      display: flex;
+      background: white;
+      border-radius: 1rem;
+      background: linear-gradient(45deg, #c5c5c5 0%, #ffffff 100%);
+      padding: 0.3rem;
+      gap: 0.3rem;
+      max-width: 300px; /* Set your desired maximum width */
+      width: 100%;
+    }
+
+    .input-container input {
+      border-radius: 0.8rem 0 0 0.8rem;
+      background: #e8e8e8;
+      width: 89%;
+      flex-basis: 75%;
+      padding: 1rem;
+      border: none;
+      border-left: 2px solid #ff9d9d;
+      color: #5e5e5e;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .input-container input:focus {
+      border-left: 2px solid #ff9d9d;
+      outline: none;
+    }
+
+    .input-container button {
+      flex-basis: 25%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #8a2be2 0%, #800080 100%); /* Purple background */
+      font-weight: 900;
+      letter-spacing: 0.3rem;
+      text-transform: uppercase;
+      color: white;
+      border: none;
+      width: 100%;
+      border-radius: 0 1rem 1rem 0;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .input-container button:hover {
+      background: linear-gradient(135deg, #A8E4A0 0%, #32CD32 100%);
+      color: red; /* Change text color on hover to red */
+    }
+
+    @media (max-width: 500px) {
+      .input-container {
+        flex-direction: column;
+      }
+
+      .input-container input {
+        border-radius: 0.8rem;
+      }
+
+      .input-container button {
+        padding: 1rem;
+        border-radius: 0.8rem;
+      }
+    }
+
+    .centered-text {
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-<h1>WhatsApp Session Generator</h1>
-<div class="tab-container">
-<button class="tab-button active" onclick="openTab('qrTab', this)">QR Code</button>
-<button class="tab-button" onclick="openTab('pairTab', this)">Pairing Code</button>
-</div>
+  <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user"></i>
+          <p>
+            <h3 class="centered-text">Link with phone number</h3>
+            <br>
+            <h6>⚙Enter your number with country code.⚙</h6>
+            <div class="input-container">
+              <input placeholder="+947734xxxx" type="number" id="number" placeholder="👻enter your phone number with country code" name="">
+              <button id="submit">enter</button>
+            </div>
+           
+            <a id="waiting-message" class="centered-text" style="display: none;">in process...</a>
+            <br>
+            <br>
+            <main id="pair"></main>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+    let box = document.getElementById("box");
 
-<div id="qrTab" class="tab-content active">
-<h2>Generate Session via QR Code</h2>
-<button id="generateQr">Generate QR Code</button>
-<div id="qrCode"></div>
-<div id="qrResult" class="result"></div>
-</div>
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:blue;font-weight:bold";
+      obj.size = "5";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:black;font-weight-bold";
+        obj.size = "5";
+      }, 500);
+    }
 
-<div id="pairTab" class="tab-content">
-<h2>Generate Session via Pairing Code</h2>
-<input type="text" id="phoneNumber" placeholder="Enter phone number with country code">
-<button id="generatePair">Get Pairing Code</button>
-<div id="pairResult" class="result"></div>
-</div>
-
-<script>
-function openTab(tabName, el) {
-    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
-    document.getElementById(tabName).classList.add('active');
-    el.classList.add('active');
-}
-
-document.getElementById('generateQr').addEventListener('click', async ()=>{
-    const qrResult = document.getElementById('qrResult');
-    qrResult.innerHTML = 'Generating QR code...';
-    try {
-        const response = await fetch('/api/qr', { method:'POST', headers:{ 'Content-Type':'application/json' }});
-        if(!response.ok){ const text = await response.text(); throw new Error(text); }
-        const data = await response.json();
-        if(data.success){
-            document.getElementById('qrCode').innerHTML = `<img src="${data.qr}" alt="QR Code">`;
-            qrResult.innerHTML = data.message;
-        } else qrResult.innerHTML = `Error: ${data.error}`;
-    } catch(err){ qrResult.innerHTML = `Error: ${err.message}`; }
-});
-
-document.getElementById('generatePair').addEventListener('click', async ()=>{
-    const phoneNumber = document.getElementById('phoneNumber').value;
-    const pairResult = document.getElementById('pairResult');
-    if(!phoneNumber){ pairResult.innerHTML='Please enter a phone number'; return; }
-    pairResult.innerHTML='Requesting pairing code...';
-    try {
-        const response = await fetch('/api/pair',{ method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({phoneNumber}) });
-        if(!response.ok){ const text = await response.text(); throw new Error(text); }
-        const data = await response.json();
-        if(data.success){
-            pairResult.innerHTML = `<p>Your pairing code: <strong>${data.pairingCode}</strong></p><p>${data.message}</p>`;
-        } else pairResult.innerHTML = `Error: ${data.error}`;
-    } catch(err){ pairResult.innerHTML = `Error: ${err.message}`; }
-});
-</script>
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!c.value) {
+        a.innerHTML = '<a style="color:black;font-weight:bold">❗Enter your whatsapp number with country code.</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:black;font-weight:bold">🚫 Invalid number format</a><br><br>';
+      } else {
+        const bc = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+        const cc = bc.split('');
+        cc.map(a => {
+          bbc += a;
+          if (bbc.length == 3) {
+            bb += " " + a;
+          } else if (bbc.length == 8) {
+            bb += " " + a;
+          } else {
+            bb += a;
+          }
+        });
+        c.type = "text";
+        c.value = "+" + bb;
+        c.style = "color:black;font-size:20px";
+        a.innerHTML = '<a style="color:black;font-weight:bold">Please wait 🔖 </a><br><br>';
+        let { data } = await axios(`/code?number=${bc}`);
+        let code = data.code || "Service Unavailable";
+        a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:black;font-weight:bold">' + code + '</span></font><br><br><br>';
+      }
+    });
+  </script>
 </body>
 </html>
